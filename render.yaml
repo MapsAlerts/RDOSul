@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: rdo-generator
+    runtime: node
+    buildCommand: npm install --include=dev && node script/build.mjs
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production

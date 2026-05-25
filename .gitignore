@@ -1,0 +1,39 @@
+﻿# Dependências
+node_modules/
+.venv/
+venv/
+env/
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+
+# Banco e arquivos locais
+*.db
+*.sqlite
+*.sqlite3
+
+# Variáveis e credenciais
+.env
+*.env
+token.json
+credentials.json
+client_secret*.json
+
+# Arquivos internos que NÃO devem subir
+.local/
+.agents/
+attached_assets/
+.replit
