@@ -41,7 +41,8 @@ import {
   Clock,
   Save,
   FileDown,
-  Printer
+  Printer,
+  PenLine
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -239,6 +240,7 @@ export default function Dashboard() {
   // Company Branding State
   const [companyName, setCompanyName] = useState("");
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
+  const [prepostoSignature, setPrepostoSignature] = useState<string | null>(null);
 
   // Contract Configuration State
   const [companyCNPJ, setCompanyCNPJ] = useState("05.208.211/0001-38");
@@ -265,6 +267,7 @@ export default function Dashboard() {
         const config = JSON.parse(savedConfig);
         if (config.companyName) setCompanyName(config.companyName);
         if (config.companyLogo) setCompanyLogo(config.companyLogo);
+        if (config.prepostoSignature) setPrepostoSignature(config.prepostoSignature);
         if (config.companyCNPJ) setCompanyCNPJ(config.companyCNPJ);
         if (config.contractLocal) setContractLocal(config.contractLocal);
         if (config.contractNumber) setContractNumber(config.contractNumber);
@@ -301,6 +304,7 @@ export default function Dashboard() {
     const config = {
       companyName,
       companyLogo,
+      prepostoSignature,
       companyCNPJ,
       contractLocal,
       contractNumber,
@@ -309,7 +313,7 @@ export default function Dashboard() {
       contractExtensionDays,
     };
     localStorage.setItem('rdo_config', JSON.stringify(config));
-  }, [companyName, companyLogo, companyCNPJ, contractLocal, contractNumber, contractStartDate, contractEndDate, contractExtensionDays]);
+  }, [companyName, companyLogo, prepostoSignature, companyCNPJ, contractLocal, contractNumber, contractStartDate, contractEndDate, contractExtensionDays]);
 
   // --- LocalStorage: Save filter period when changed ---
   useEffect(() => {
@@ -965,7 +969,13 @@ export default function Dashboard() {
                 <p style="font-size: 9px; font-weight: 600; color: #334155; margin: 0; text-transform: uppercase;">Fiscalizadora</p>
               </div>
               <div style="text-align: center;">
-                <div style="border-bottom: 1px solid #334155; margin-bottom: 8px; height: 40px;"></div>
+                ${prepostoSignature ? `
+                  <div style="border-bottom: 1px solid #334155; margin-bottom: 8px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <img src="${prepostoSignature}" alt="Assinatura Preposto" style="max-height: 38px; max-width: 100%; object-fit: contain;" />
+                  </div>
+                ` : `
+                  <div style="border-bottom: 1px solid #334155; margin-bottom: 8px; height: 40px;"></div>
+                `}
                 <p style="font-size: 9px; font-weight: 600; color: #334155; margin: 0; text-transform: uppercase;">Preposto</p>
               </div>
             </div>
@@ -2318,6 +2328,45 @@ export default function Dashboard() {
                    )}
                  </div>
                </div>
+
+                 <div className="space-y-1 pt-2">
+                   <label className="text-[10px] text-muted-foreground">Assinatura do Preposto (PNG, JPG)</label>
+                   {prepostoSignature ? (
+                     <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
+                       <img src={prepostoSignature} alt="Assinatura" className="w-12 h-8 object-contain" />
+                       <span className="text-xs text-green-700 flex-1 truncate">Assinatura carregada</span>
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         className="h-5 w-5 p-0 text-red-500 hover:text-red-700"
+                         onClick={() => setPrepostoSignature(null)}
+                       >
+                         ×
+                       </Button>
+                     </div>
+                   ) : (
+                     <label className="flex items-center gap-2 p-2 border border-dashed rounded cursor-pointer hover:bg-muted/50 transition-colors">
+                       <PenLine className="w-4 h-4 text-muted-foreground" />
+                       <span className="text-xs text-muted-foreground">Clique para carregar assinatura</span>
+                       <input
+                         type="file"
+                         accept="image/png,image/jpeg,image/jpg"
+                         className="hidden"
+                         onChange={(e) => {
+                           const file = e.target.files?.[0];
+                           if (file) {
+                             const reader = new FileReader();
+                             reader.onload = (event) => {
+                               setPrepostoSignature(event.target?.result as string);
+                             };
+                             reader.readAsDataURL(file);
+                           }
+                         }}
+                         data-testid="input-preposto-signature"
+                       />
+                     </label>
+                   )}
+                 </div>
                <p className="text-[10px] text-muted-foreground">
                  Informações exibidas no cabeçalho do PDF.
                </p>
