@@ -1470,7 +1470,7 @@ export default function Dashboard() {
     // Final safety: remove rows without any meaningful data (applies to both paths)
     const jsonData2 = jsonData.filter((row: Record<string, any>) => {
       const ts = row['Carimbo de data/hora'];
-      const dt = row['Data'];
+      const dt = row['Data'] || row['Data atividade'];
       return (ts !== null && ts !== undefined && String(ts).trim() !== '') ||
              (dt !== null && dt !== undefined && String(dt).trim() !== '' && String(dt).trim() !== '0');
     });
@@ -1480,11 +1480,12 @@ export default function Dashboard() {
 
     const parsed: ReportData[] = jsonData2.map((row: any, index: number) => {
        let parsedDate: Date | null = null;
-       if (row['Data']) {
-         if (typeof row['Data'] === 'number') {
-           parsedDate = new Date((row['Data'] - (25567 + 1)) * 86400 * 1000);
+       const rawDate = row['Data'] || row['Data atividade'];
+       if (rawDate) {
+         if (typeof rawDate === 'number') {
+           parsedDate = new Date((rawDate - (25567 + 1)) * 86400 * 1000);
          } else {
-           const dateStr = String(row['Data']).trim();
+           const dateStr = String(rawDate).trim();
            // Tentar formatos brasileiros (dd/mm/yyyy) - NUNCA usar new Date() diretamente
            const formats = ['dd/MM/yyyy', 'd/M/yyyy', 'dd-MM-yyyy', 'd-M-yyyy'];
            for (const fmt of formats) {
@@ -1532,7 +1533,7 @@ export default function Dashboard() {
          // OBRIGATÓRIAS
          data: parsedDate,
          tecnico,
-         atividade: row['Atividade Realizada'] || "S/I",
+         atividade: row['Atividade Realizada'] || row['Descreva a atividade Realizada'] || "S/I",
          om,
          mina: row['Mina'] || "S/I",
          localidade,
@@ -1553,7 +1554,7 @@ export default function Dashboard() {
          quemTrabalhou: row['Quem trabalhou com você?'] || row['Quem trabalhou com vocÃª?'],
          equipamentos: row['Equipamentos'] || '',
          veiculos: row['Veículos e Equipamentos Móveis'] || row['VeÃ­culos e Equipamentos MÃ³veis'] || '',
-         climaMatutino: row['Clima Matutino'] || '',
+         climaMatutino: row['Clima Matutino'] || row['Tempo'] || '',
          climaVespertino: row['Clima Vespertino'] || '',
          climaNoturno: row['Clima Noturno'] || '',
          fotosAntes: [
